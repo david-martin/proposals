@@ -25,7 +25,7 @@ For example, if a KeyCloak and fh-sync-server service were created and bound, th
 
 ### Core SDK
 
-The Core SDK will be the package that all service modules inherit from.  It will be responsible for managing network requests, logging, error handling and resolution, loading configuration for mobile-core services, and other cross cutting concerns.  Modules will interface with the core SDK by implementing the necessary interfaces provided and annotating the implementations so that the Core SDK will be able to correctly manage them as well.  The Core SDK will also allow some of its internals to be exposed through interfaces for purposes such as testing, bespoke integrations, and management of additional resources.
+The Core SDK will be the package that all service modules inherit from.  It will be responsible for managing network requests, threading, logging, error handling and resolution, loading configuration for mobile-core services, and other cross cutting concerns.  Modules will interface with the core SDK by implementing the necessary interfaces provided and annotating the implementations so that the Core SDK will be able to correctly manage them as well.  The Core SDK will also allow some of its internals to be exposed through interfaces for purposes such as testing, bespoke integrations, and management of additional resources.
 
 The Core SDK will provide a request lifecycle that the Psuedocode section will demonstrate.
 
@@ -77,6 +77,16 @@ The error handling method on the service is defined as such :
  ```
 This method is simple.  It will try to resolve the error and return true if it is resolved or false if it is not.  On true mobile core will stop error handling and either retry if appropriate or flag a status in the response.  Activities will see this flag by using the requestHandle.  On false mobilecore will try the next service error handler.  If no services can resolve the error then that is flagged in the requestHandle box.
 
+#### Using Core Threads
+
+The Mobile Core SDK will provide Java Executors that wrap several common blocking tasks.  These executors will be available to any module or part of the application which may need to schedule diskIO work, netowrking work, or work to happen on the main thread.
+
+```
+AppExecutors.networkThread.execute(() -> {
+  var result = someRequest.call(); //Perform a HTTP operation off the main thread
+  AppExecutors.mainThread.execute(()->{updateDisplay(result);});//Update the Android UI on the main thread.
+ });
+```
 
 ### Misc. Bits
 The following topics are not required 
