@@ -33,6 +33,10 @@ The Core SDK will provide a request lifecycle that the Psuedocode section will d
 
 Service modules will each represent a singular service that is supportd by mobile-core.  We will use, where available and practical, existing libraries for services and in those cases the modules will provide the necessary implementation of Core APIs to make them compatable with the Core SDK lifecycles and features.  The first Services we are looking at integrations will be Keycloak, fh-sync-service, and a RESTful API service module.
 
+### Implementation notes
+
+Public APIs should always expose native Java Objects and not stringified JSON or JSON Objects.
+
 ### Use cases and psuedo code examples
 
 #### Defining a Service Module
