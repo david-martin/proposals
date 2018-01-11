@@ -105,3 +105,10 @@ In order to compete with Firebase's mindshare we should be able to inspect and c
 #### CI/CD
 Ci/Cd will be provided by Circle CI.  In the past we have used other services, but for Android builds we have had the best luck with Circle CI.  We will improve the value of these services by limiting testing in these environments to automated tests which do not require a emulator.  Before any release is made and during local development we will still provide and run tests that require an Android emulator.
 
+#### Repository and Packaging
+
+The Core SDK and service modules will live in a single repository at https://github.com/aerogear/aerogear-android-sdk.  The Core SDK and each service module will be gradle modules within this project.  Service modules will depend on the core SDK.  Modules and the SDK will be published individually as Maven packages.
+
+#### Documentation
+
+Public methods and properties will be documented using JavaDoc.  At release JavaDocs will be bundled with the maven artifacts and also published on aerogear.org.
