@@ -24,9 +24,11 @@ If we create a set of coherent guidelines and model our automated PR checks by t
 
 These proposals only concern relevant repositories.
 
-### Repository should have a mandatory review by other person
+### Repository should have a mandatory review by two other developers
 
-This is easily enabled in GitHub. It mandates that at least one person gives a PR a green check-mark.
+This stops rushed PRs and ensures knowledge of the change is spread across the team
+In github it is easy to enforce at least one reviever as necessary. It is possible to implement multiple-reviewers policy through API,
+but it might not be worth the effort.
 
 There will be some decisions that we don't want to automate on purpose, for example, we will probably display code-coverage prominently,
 but we won't have any automatically enforced that would stop PR from getting merged due to low coverage.
@@ -38,10 +40,11 @@ There could be a template with a checklist delivered by a .github/PULL_REQUEST_T
 Checklist would include:
 
 * Read through the code and ask about any unclear code
-* Try to checkout and run the relevant code
 * Evaluate if the new code is sufficiently tested, potentially consulting the code-coverage
 * Evaluate if there are any follow-up tasks to be logged
 * more?
+
+The reviewer shouldn't need to checkout and run the code, we would mandate that our CI can cover this case automatically.
 
 ### All of the automated testing should finish in reasonable time, defined as in less than 10 minutes
 
@@ -59,19 +62,29 @@ but the style enforcement still seems to be quite useful, especially for new col
 
 For configuration files and dynamic languages, style checking can often find basic problems that would be discovered in compiled languages with type-checker.
 
-We could experiment even with automatic style formatting, such as:
-* gofmt
-* grunt-jsbeautifier
+For go, we will be using
+* go vet
+* go lint
+* go fmt 
+* errcheck
 
-We should enforce the style for:
-* go, probably with golint
-* javascript, probably with eslint, modeling after openshift-team's style guide
+For jaascript, we will base our lint on the origin-web-console
+* https://github.com/openshift/origin-web-console/blob/master/.jshintrc
+
+We should decide how to enforce the style for:
 * ansible, if some check exists
 * bash (proposed by Pavel Sturc)
 
 ### If there is a build-able artifact, it should be built in reasonable subset of configurations
 
 This mostly goes for binaries, such as our go-based cli tool, or compilable libraries for our mobile devices.
+If compiler can build for multiple OSes or ARCHs, we should build all that we plan to release,
+i.e. for go this would mean:
+* linux
+* windows
+* mac
+
+We wouldn't require that we need to run tests against all of the architectures.
 
 We probably want to include things like Docker-files here as well.
 
