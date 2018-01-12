@@ -39,9 +39,122 @@ Public APIs should always expose native Java Objects and not stringified JSON or
 
 ### Use cases and psuedo code examples
 
-#### Defining a Service Module
-A service interface will be responsible for building requests, parsing responses, handling errors.  Services may depend on each other and the method of service composition is currently under evaluation. However, services will have a resolution order where a request is passed along a chain until it is ready to be executed.
-#### Create a Request
+#### Staring up Mobile Core
+MobileCore is the "main" class for the SDK of the Core SDK.  Users instanciate it by placing a client configuration file in their assets directory, configuring MobileCore.Builder, and then calling its build method.
+
+```
+MobileCore.Builder builder = new MobileCore.Builder(application);
+MobileCore core = builder.build();
+```
+
+During the build method, MobileCore will scan a registry of services and configure them by calling the method `bootstrap` defined in the ServiceModule interface.  MobileCore will pass to bootstrap the core instance and the section of mobile-core.json that corresponds to that service.
+
+#### Writing a Service Module
+A service interface will be responsible for building requests, parsing responses, handling errors.  Services may depend on each other and the method of service composition is currently under evaluation. However, services will have a resolution order where a request is passed along a chain until it is ready to be executed.  Mobile Core will provide the services `threading`, `logging`, and `networking`.  ServiceModules will implement the service module class and provide a default no argument constructor.  
+
+Example KeyCloakService
+```
+public class KeyCloakService implements ServiceModule {
+   /* snip */
+   public KeyCloakService() {}
+
+   @Override
+    public void bootstrap(MobileCore core, ServiceConfiguration config) {
+        this.serverUrl = config.getProperty("auth-server-url");
+        this.clientId = config.getProperty("client_id");
+        this.audience = config.getProperty("audience");
+        this.grantType = config.getProperty("grant_type");
+        this.subjectTokenType = config.getProperty("subject_token_type");
+        this.requestedTokenType = config.getProperty("requested_token_type");
+        this.realm = config.getProperty("realm");
+        this.core = core;
+    }
+}
+```
+
+#### Registering a Service Module and the ServiceModuleRegistry
+The Core SDK will provide a service registry that modules can register themselves with as well as register their dependencies.  During build MobileCore will call bootstrap on services in the order of those with the least dependencies to those with the most dependencies.
+
+Example registration of KeyCloakService
+```
+public class KeyCloakService implements ServiceModule {
+  static {
+    ServiceModuleRegistry.registerServiceModule("keycloak", KeyCloakService.class, "network");
+  }
+  /*snip*/
+}
+```
+
+ServiceModuleRegistry.java
+```
+
+/**
+ * Registry of service modules.  It is responsible for maintaining a mapping of service modules to
+ * their types as well as the dependencies each module expects.
+ */
+public final class ServiceModuleRegistry {
+    private static final Map<String, Class<? extends ServiceModule>> serviceTypeMap = new HashMap<>();
+    private static final Map<String, String> dependencyMap = new HashMap<>();
+    /**
+     * Register the looking for a service module to a class.
+     *
+     * @param type the type of module to use
+     * @param moduleClass the class that implements a service module type
+     * @param dependsOn the other serviceTypes this Service Depends on.
+     */
+    public static void registerServiceModule(String type, Class<? extends ServiceModule> moduleClass, String... dependsOn) {
+        serviceTypeMap.put(type, moduleClass);
+        for (String dependency : dependsOn) {
+            dependencyMap.put(type, dependency);
+        }
+    }
+
+}
+```
+** Discussion Point ** I'm not a fan of static methods during testing.  Perhaps there should be a method in the ServiceModule interface which returns a list of services that the service depends on.  MobileCore could then read that list by invoking that method as part of bootstrapping.
+
+#### Referencing a Service
+An instance of the core bassed during bootstrap can be used to reference other services.  MobileCore is responsible for ensuring that ServiceModule.bootstrap is not called until all declared dependencies are bootstrapped.
+
+SyncService.java
+```
+public class SyncService implements ServiceModule {
+
+  KeyCloakService keycloakService;
+  /*snip*/
+  public void bootstrap(MobileCore core, ServiceConfiguration config) {
+     this.keycloakService = core.getService("keycloak", KeyCloakService.class);
+     this.networkService = core.getService("network", NetworkService.class);
+     /*snip*/
+  }
+
+  public void performSync() {
+    if (keycloakService.isLoggedIn()) {
+      Reuqest request = networkService.newRequest();
+      request.addSecurityHeaders(keycloakService.getHeaders());//pseudocode method, don't expect this exactly.
+      request.setData(this.buildrequestBody());
+      Response response = networkService.execute(request);
+      response.onError(/*Error handling lambda*/);
+      response.onSuccess(/*Success handling lambda*/);
+    }
+  }
+
+}
+```
+
+#### Using Core Threads
+
+The Mobile Core SDK will provide Java Executors that wrap several common blocking tasks.  These executors will be available to any module or part of the application which may need to schedule diskIO work, netowrking work, or work to happen on the main thread.
+
+```
+AppExecutors.networkThread.execute(() -> {
+  var result = someRequest.call(); //Perform a HTTP operation off the main thread
+  AppExecutors.mainThread.execute(()->{updateDisplay(result);});//Update the Android UI on the main thread.
+ });
+```
+
+#### Deprecated as we are moving away from annotations for the initial version
+##### Create a Request
 A request is a object that is ready to be executed. The request contains in itself any authentication tokens, headers, etc necessary to connect to a service running in a mobile-core environment.
 For this example, let’s say the user is writing a photo sharing application.  They will probably in their application have an interface that looks like this : 
 ```
@@ -66,27 +179,16 @@ RequestHandle handle = org.aerogear.android.core.MobileService.from(UploadServic
 The ‘handle’ would be how end user code keeps track of the status of the request.  It should be parcelable, non leaking, etc.  RequestHandle will be used to either poll for or register for events from the service as appropriate.
 
 
-#### Return a response
+##### Return a response
 Responses are’t returned per se.  A handle is returned from a request invocation.  The handle is a wrapper around some serializable ID and the mobile core apis are responsible for providing information about that request.  Eventually (tbd how) a result can be returned from mobilecore for that request handle.
 
-#### Handle an Error
+##### Handle an Error
 Error handling is defined in the service interface.  Mobile-core will be responsible for trying these error handlers in a sane order (tbd) and retrying a request if approrpriate.
 The error handling method on the service is defined as such :
 ```
  boolean handleError(Request request, Response errorResponse);
  ```
 This method is simple.  It will try to resolve the error and return true if it is resolved or false if it is not.  On true mobile core will stop error handling and either retry if appropriate or flag a status in the response.  Activities will see this flag by using the requestHandle.  On false mobilecore will try the next service error handler.  If no services can resolve the error then that is flagged in the requestHandle box.
-
-#### Using Core Threads
-
-The Mobile Core SDK will provide Java Executors that wrap several common blocking tasks.  These executors will be available to any module or part of the application which may need to schedule diskIO work, netowrking work, or work to happen on the main thread.
-
-```
-AppExecutors.networkThread.execute(() -> {
-  var result = someRequest.call(); //Perform a HTTP operation off the main thread
-  AppExecutors.mainThread.execute(()->{updateDisplay(result);});//Update the Android UI on the main thread.
- });
-```
 
 ### Misc. Bits
 The following topics are not required 
