@@ -79,7 +79,7 @@ Example registration of KeyCloakService
 ```
 public class KeyCloakService implements ServiceModule {
   static {
-    ServiceModuleRegistry.registerServiceModule("keycloak", KeyCloakService.class, "network");
+    ServiceModuleRegistry.registerServiceModule("keycloak", KeyCloakService.class, "http");
   }
   /*snip*/
 }
@@ -153,42 +153,12 @@ AppExecutors.networkThread.execute(() -> {
  });
 ```
 
-#### Deprecated as we are moving away from annotations for the initial version
-##### Create a Request
-A request is a object that is ready to be executed. The request contains in itself any authentication tokens, headers, etc necessary to connect to a service running in a mobile-core environment.
-For this example, let’s say the user is writing a photo sharing application.  They will probably in their application have an interface that looks like this : 
-```
-public interface UploadService {
-   public RequestHandle upload(Picture mypicture);
-}
-```
-There will be, in OpenShift, a Mobile application, a sync server, a keycloak server, and a storage server.  An implementation of this interface could load a keycloak token from the device, validate the token, start a new OkHttpRequest object, Upload the file etc etc.  What I am getting at is that this is a very laborious process.  However, let’s annotate this call a bit.
-```
-@MobileService(requires = {KeycloakService.class, SyncService.class, StorageService.class},
-                  appKey=”xyz”)
-public interface UploadService {
-   @ServiceMethod
-   public RequestHandle upload(Picture mypicture);
-}
-```
-In this world, the `@MobileService` annotation would signal to the core SDK that this interface should be implemented by our libraries and it requires a request to include the Keycloak, Sync, and Storage.
-The code could then be invoked by the developer as follows : 
-```
-RequestHandle handle = org.aerogear.android.core.MobileService.from(UploadService.class).upload(myPicture);
-```
-The ‘handle’ would be how end user code keeps track of the status of the request.  It should be parcelable, non leaking, etc.  RequestHandle will be used to either poll for or register for events from the service as appropriate.
+#### Using Core Networking
+For now, networking will be a service exposed by a http service module.  The definition of this service will be a different proposal.
 
+#### Proposal diagram
+![Core Service and Module diagram](./img/diagram.png)
 
-##### Return a response
-Responses are’t returned per se.  A handle is returned from a request invocation.  The handle is a wrapper around some serializable ID and the mobile core apis are responsible for providing information about that request.  Eventually (tbd how) a result can be returned from mobilecore for that request handle.
-
-##### Handle an Error
-Error handling is defined in the service interface.  Mobile-core will be responsible for trying these error handlers in a sane order (tbd) and retrying a request if approrpriate.
-The error handling method on the service is defined as such :
-```
- boolean handleError(Request request, Response errorResponse);
- ```
-This method is simple.  It will try to resolve the error and return true if it is resolved or false if it is not.  On true mobile core will stop error handling and either retry if appropriate or flag a status in the response.  Activities will see this flag by using the requestHandle.  On false mobilecore will try the next service error handler.  If no services can resolve the error then that is flagged in the requestHandle box.
 
 ### Misc. Bits
 The following topics are not required 
