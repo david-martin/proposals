@@ -39,7 +39,7 @@ Public APIs should always expose native Java Objects and not stringified JSON or
 
 ### Use cases and psuedo code examples
 
-#### Staring up Mobile Core
+#### Starting up Mobile Core
 MobileCore is the "main" class for the SDK of the Core SDK.  Users instanciate it by placing a client configuration file in their assets directory, configuring MobileCore.Builder, and then calling its build method.
 
 ```
