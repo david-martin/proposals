@@ -169,7 +169,45 @@ Android development relies on many features in Gradle.  Most of these features a
 The build plugin will invoke the mobile-cli to gather facts about the current state of the server and insure that the correct modules are installed and provide useful configuration.
 
 #### BOM support and enforcement
-Gradle lacks a lockfile mechanism for enforcing dependency versions.  In Android builds this means that it is very easy for projects and their dependencies to have conflicting library versions.  We will use a BOM (Bill of Materials) plugin to enforce dependency versions among our code and for end users applicaitons.  We are still evaluating plugins to provide this functionality at this time.
+Gradle lacks a lockfile mechanism for enforcing dependency versions.  In Android builds this means that it is very easy for projects and their dependencies to have conflicting library versions. We will use a BOM (Bill of Materials) plugin to enforce dependency versions among our code and for end users applications.
+We will use the [Dependency Management Plugin](https://github.com/spring-gradle-plugins/dependency-management-plugin) provided by Spring. This plugin can be used in two ways:
+
+1) Defining the dependency versions in the (parent project's) gradle build file
+2) Referencing a remote maven BOM
+
+For our use case we are choosing variant 2. The plugin does not allow to inherit from the dependency management configuration, nor does gradle. Thus approach 1 would work for our own SDK but users would not be able to make use of the BOM.
+We will instead provide a Maven BOM specifically tailored for the Android SDK located in [Aerogear Parent](https://github.com/aerogear/aerogear-parent). Aerogear Parent will be a dependency of the Android SDK and can also be used by our users and customers.
+
+The BOM itself is a regular `pom.xml` file defining a dependency management section:
+
+```
+<dependencyManagement>
+    <dependencies>
+        <dependency>
+            ... (group, artifact and version)
+        </dependency>
+        ...
+    </dependencies>
+</dependencyManagement>
+```
+
+We then need to apply the BOM to all subprojects (core, sync, keycloak, etc.) in our parent module (build.gradle):
+
+```
+plugins {
+    id "io.spring.dependency-management" version "1.0.4.RELEASE"
+}
+...
+subprojects {
+    apply plugin: 'io.spring.dependency-management'
+
+    dependencyManagement {
+        imports {
+            mavenBom 'org.jboss.aerogear:aerogear-parent:1.0-SNAPSHOT'
+        }
+    }
+}
+```
 
 #### Android Studio Plugin
 In order to compete with Firebase's mindshare we should be able to inspect and configure the core SDK and service modules using gui tools.  This idea will be fleshed out in a future proposal.
