@@ -111,7 +111,7 @@ public final class ServiceModuleRegistry {
 
 }
 ```
-** Discussion Point ** I'm not a fan of static methods during testing.  Perhaps there should be a method in the ServiceModule interface which returns a list of services that the service depends on.  MobileCore could then read that list by invoking that method as part of bootstrapping.
+** Discussion Point ** I'm not a fan of static methods during testing.  Perhaps there should be a method in the ServiceModule interface which returns a list of services that the service depends on.  MobileCore could then read that list by invoking that method as part of bootstrapping.  Furthermore, if we move to using Dagger to manage service modules it will elminate the static problem but then we will need to have constructor based injection.  Therefore in a future implementation ServiceRegistry will probably be implemented by or replaced with Dagger. This will be described more fully in a future proposal.
 
 #### Referencing a Service
 An instance of the core bassed during bootstrap can be used to reference other services.  MobileCore is responsible for ensuring that ServiceModule.bootstrap is not called until all declared dependencies are bootstrapped.
