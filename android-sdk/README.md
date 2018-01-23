@@ -107,9 +107,9 @@ public class KeyCloakService implements ServiceModule {
 #### Referencing a Service
 An instance of the core bassed during bootstrap can be used to reference other services.  MobileCore is responsible for ensuring that ServiceModule.bootstrap is not called until all declared dependencies are bootstrapped.
 
-SyncService.java
+CustomService.java
 ```java
-public class SyncService implements ServiceModule {
+public class CustomService implements ServiceModule {
 
   KeyCloakService keycloakService;
   /*snip*/
@@ -119,7 +119,7 @@ public class SyncService implements ServiceModule {
      /*snip*/
   }
 
-  public void performSync() {
+  public void performCustomAction() {
     if (keycloakService.isLoggedIn()) {
       Reuqest request = networkService.newRequest();
       request.addSecurityHeaders(keycloakService.getHeaders());//pseudocode method, don't expect this exactly.
