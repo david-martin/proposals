@@ -36,21 +36,11 @@ In this example we have  ```servicesinstances``` and ```fh-sync-server``` that a
 
 ## Errors
 
-In the case of an error, there should be a clear message printed as the first line of output followed by the usage for that command, the process should then exit with a non zero exit code so then when being called from an external program it is clear when something has failed.
+In the case of an error, there should be a clear message printed as the first line of output, the process should then exit with a non zero exit code so then when being called from an external program it is clear when something has failed.
 In the case of an exception or unexpected error, a clear error should still be shown as the first line of output, however the stacktrace should also be shown so that it can be used in support tickets and github issues to highlight were the bug is and how it happened.
 
 ```
 Error: failed to find a service class associated with that name
-Usage:
-  mobile create serviceinstance <serviceName> [flags]
-
-Flags:
-  -h, --help      help for serviceinstance
-      --no-wait   --no-wait will cause the command to exit immediately instead of waiting for the service to be provisioned
-
-Global Flags:
-      --namespace string   --namespace=myproject
-  -o, --output string      -o=json -o=template (default "table")
 
 error: exit status 1
 ```
