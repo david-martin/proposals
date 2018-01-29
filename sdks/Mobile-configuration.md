@@ -25,7 +25,7 @@ Configuration also exposes some internal fields.
 ```
 
 Most important parameters often have different names. For example some services contain `url` property and some `uri`.
-Service specific metadata prevents us from strict json parsing.
+Service specific `config` prevents us from strict json parsing.
 
 ## Expectations
 
@@ -49,7 +49,7 @@ Labels will conform to schema that can also used as documentation for services. 
 
 `mobile-service.json` file will aggregate all service definitions.
 Each service will have their own specific data (schema) that will be used directly in service SDK.
-This schema will be supplied in additional `metadata` parameter.
+This schema will be supplied in additional `config` parameter.
 
 ### Initial top level json schema
 
@@ -72,6 +72,6 @@ This schema will be supplied in additional `metadata` parameter.
   "name": "string",
   "type": "string",
   "url": "string",
-  "metadata": "object"
+  "config": "object"
 }
 ```
