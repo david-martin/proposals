@@ -57,8 +57,11 @@ Receives `Content-Type: application/json` containing JSON with following schema:
   "appVersion": "256",
   "platform": "android",
   "platformVersion": "27",
+  "timestamp": "12223123123"
 }
 ```
+
+Timestamp must be in UTC, without any time zone. Daylight saving should also be discarded. Server side application will get the timestamp and convert it to timestamp with server's timezone.
 
 It is not part of this proposal what client id is, but it must be something unique per device/client.
 
