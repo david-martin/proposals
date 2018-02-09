@@ -6,7 +6,7 @@ This document contains the proposal for gathering some default metrics of mobile
 
 ### Goals
 
-- Provide mobile app developers a service that can receive some basic default metrics, namely sdk version and app version
+- Provide mobile app developers a service that can receive some basic default metrics, namely sdk version, app version and platform version
 
 - Provide developers an interface to query and visualize the gathered data in order to make informed decisions
 
@@ -14,7 +14,7 @@ This document contains the proposal for gathering some default metrics of mobile
 
 - Identify individual devices or users in metrics events (bonus)
 
-- Registering of user-defined metrics and logs (not prioritized; just keep in mind)
+- Registering of user-defined metrics and logs (not prioritized; just kept in mind)
 
 - Provide mobile app developers with an easy to use SDK to connect easily and securely to the metrics service (separate epic/proposal)
 
@@ -34,13 +34,11 @@ The following diagram illustrates the components:
 
 ### Mobile App Client
 
-A native, platform-specific SDK for targeting the Metrics Service will be available to developers.
+Platform-specific SDK for targeting the metrics service will be available as IOS, Android and Cordova Plugins, React Native plugins.
 
 Upon installation into a project and providing configuration for targeting the Metrics Service the SDK will automatically 
 send the default metrics information for the application with a unique ID to the metrics service.
 This information will be sent to the service every time the application starts.  
-
-Please note that, the client side is not part of this proposal.
 
 ### Mobile Metrics Service
 
@@ -56,7 +54,9 @@ Receives `Content-Type: application/json` containing JSON with following schema:
   "clientId": "deadbeef123"
   "appId": "com.example.someApp"
   "sdkVersion": "2.4.6"
-  "appVersion": "256"
+  "appVersion": "256",
+  "platform": "android",
+  "platformVersion": "27",
 }
 ```
 
