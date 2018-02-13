@@ -32,6 +32,13 @@ The following diagram illustrates the components:
 
 ![service diagram](./default-mobile-metrics-system-landscape.png)
 
+
+## Where it lives
+
+Initially, we will extend the backend metrics APB and have the new components there. 
+
+## Components
+
 ### Mobile App Client
 
 Platform-specific SDK for targeting the metrics service will be available as IOS, Android and Cordova Plugins, React Native plugins.
@@ -51,19 +58,25 @@ At a PoC level, the endpoints available from the Mobile Metrics Service should b
 Receives `Content-Type: application/json` containing JSON with following schema:
 ```
 {
-  "clientId": "deadbeef123"
-  "appId": "com.example.someApp"
-  "sdkVersion": "2.4.6"
-  "appVersion": "256",
-  "platform": "android",
-  "platformVersion": "27",
+  "app": {
+    "id": "com.example.someApp",
+    "sdkVersion": "2.4.6",
+    "appVersion": "256"
+  },
+  "device": {
+    "id": "deadbeef123",
+    "platform": "android",
+    "platformVersion": "27"
+  },
   "timestamp": "12223123123"
 }
 ```
 
-Timestamp must be in UTC, without any time zone. Daylight saving should also be discarded. Server side application will get the timestamp and convert it to timestamp with server's timezone.
+`timestamp` must be in UTC, without any time zone. Daylight saving should also be discarded. Server side application will get the timestamp and convert it to timestamp with server's timezone.
+`timestamp` is the time when the event was recorded. Server side will also record the time when the payload was received and initially that will be used for the visualizations.
 
-It is not part of this proposal what client id is, but it must be something unique per device/client.
+
+It is not part of this proposal what `device.id` is, but it must be something unique per device/client.
 
 ### Storage
 
@@ -127,6 +140,10 @@ Other options:
 - ElasticSearch: high memory usage
 - InfluxDB: time series data only
 - MongoDB: no support on Grafana, poor time series support
+
+
+In order to provide flexibility, we are going to use semi-structured tables in Postgres with JSONB columns for time series data.
+For the data that we need to maintain, we will use regular SQL tables.
 
 ## Grafana vs others
 
