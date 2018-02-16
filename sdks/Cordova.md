@@ -7,7 +7,7 @@ Provide best performance and user experience on the platform.
 
 ## Proposed solution 1
 
-Pure javascript solution for the mobile configuration and orchiestraction 
+Pure javascript solution for the mobile configuration and orchestration 
 that will allow cooperability between JavaScript and Native.
 Mixing both existing Native plugins and pure JavaScript based solutions was identified as the most reasonable aproach.
 Configuration parser and all AeroGear Services specific business code doesn't require any native implementation and can be reused in web/cordova/react native implementations. Individual SDK will may by default be implemented in pure JavaScript or relay on the cordova plugins. 
