@@ -9,8 +9,7 @@ Provide best performance and user experience on the platform.
 
 Pure javascript solution for the mobile configuration and orchestration 
 that will allow cooperability between JavaScript and Native.
-Mixing both existing Native plugins and pure JavaScript based solutions was identified as the most reasonable aproach.
-Configuration parser and all AeroGear Services specific business code doesn't require any native implementation and can be reused in web/cordova/react native implementations. Individual SDK will may by default be implemented in pure JavaScript or relay on the cordova plugins. 
+Configuration parser and other pure JS code willnot require any native implementation and can be reused for cordova/react native implementations. Individual SDK will may by default be implemented in pure JavaScript or as Cordova/React plugins. 
 
 ## Advantages of the solution 1
 
@@ -24,9 +23,8 @@ See investigation details bellow for more details
 
 ## Proposed solution 2
 
-Pure JavaScript implementations (JavaScript SDK) that will abstract from browser support.
-JS SDK will be working with Web, Cordova and ReactNative - each platform will provide wrappers for specific apis if needed.
-This aproach will not allow us to reuse native implementations, but it will make Cordova, Web and ReactNative SDK's more consistent. Implementation could detect platform 
+Pure JavaScript implementations (JavaScript SDK) that will we written for the web and abstract from browser support.
+This means that specific browser functionalities that may not be available for React or Cordova will be provided to enable support for this platforms. JS SDK will be working with Web, Cordova and ReactNative - each platform will provide wrappers for specific apis if needed. This aproach will not allow us to reuse native implementations, but it will make Cordova, Web and ReactNative SDK's more consistent. Implementation could detect platform and load specific ReactNative/Cordova/Browser wrappers.
 
 ## Advantages of the solution 2
 
