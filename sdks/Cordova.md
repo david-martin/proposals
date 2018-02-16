@@ -11,6 +11,11 @@ Pure javascript solution for the mobile configuration and orchiestraction
 that will allow cooperability between JavaScript and Native.
 Mixing both existing Native plugins and pure JavaScript based solutions was identified as the most reasonable aproach. 
 
+## Alternative that will be considered
+
+Pure JavaScript implementations (JavaScript SDK) that will abstract from browser support.
+JS SDK will be working with Web, Cordova and ReactNative - each platform will provide wrappers for specific apis if needed.
+
 ## Advantages of the solution 
 
 - Significantly reduced effort to develop and maintain Cordova Support by reusing available components.
