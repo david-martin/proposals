@@ -31,3 +31,10 @@ AeroGear/AgsSync
 
 Service example:
 @aerogear/ags-sync
+
+## dotNet/Xamarin
+
+AeroGear.Mobile.Core 
+
+Service Example:
+AeroGear.Mobile.Sync 
