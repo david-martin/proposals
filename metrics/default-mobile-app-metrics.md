@@ -60,14 +60,16 @@ Receives `Content-Type: application/json` containing JSON with following schema:
 {
   "clientId": "453de743207a0232a339a23e5d64b289",
   "timestamp": "8377194421",
-  "app": {
-    "id": "com.example.someApp",
-    "sdkVersion": "2.4.6",
-    "appVersion": "256"
-  },
-  "device": {
-    "platform": "android",
-    "platformVersion": "27"
+  "data": {
+    "app": {
+      "id": "com.example.someApp",
+      "sdkVersion": "2.4.6",
+      "appVersion": "256"
+    },
+    "device": {
+      "platform": "android",
+      "platformVersion": "27"
+    }
   }
 }
 ```
