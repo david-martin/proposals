@@ -2,12 +2,12 @@
 
 ## Motivation
 
-Provide set of the SDK's that can be used for Cordova based development.
+Provide set of the SDK's that can be used forWeb, Cordova and React Native based development.
 Provide best performance and user experience on the platform.
 
 ## Proposed solution for Web, Cordova and React Native AeroGear Services SDK
 
-Provide JavaScript implementations (JavaScript SDK). This means that specific browser functionalities that may not be available for React or Cordova will be provided to enable support for these platforms. JS SDK will be working with Web, Cordova and React Native - each platform will provide wrappers for specific APIs if needed. This approach will not allow us to reuse native implementations, but it will make Cordova, Web and ReactNative SDK's more consistent. Implementation could detect platform and load specific ReactNative/Cordova/Browser wrappers.
+Provide JavaScript implementations (JavaScript SDK). This means that specific browser functionalities that may not be available for React or Cordova will be provided to enable support for these platforms. JS SDK will be working with Web, Cordova and React Native - each platform will provide wrappers for specific APIs if needed. This approach will not allow us to reuse native implementations, but it will make Cordova, Web and ReactNative SDK's more consistent. Implementation could detect platform and load specific ReactNative/Cordova/Browser functions written in javascript or call native plugins.
 
 ## Advantages
 
