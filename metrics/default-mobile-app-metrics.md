@@ -58,17 +58,17 @@ At a PoC level, the endpoints available from the Mobile Metrics Service should b
 Receives `Content-Type: application/json` containing JSON with following schema:
 ```
 {
+  "clientId": "453de743207a0232a339a23e5d64b289",
+  "timestamp": "8377194421",
   "app": {
     "id": "com.example.someApp",
     "sdkVersion": "2.4.6",
     "appVersion": "256"
   },
   "device": {
-    "id": "deadbeef123",
     "platform": "android",
     "platformVersion": "27"
-  },
-  "timestamp": "12223123123"
+  }
 }
 ```
 
