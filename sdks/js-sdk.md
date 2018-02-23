@@ -24,7 +24,7 @@ Provide JavaScript implementations (via a JavaScript SDK). This means the deault
 ### Advantages
 
 - Ability to reuse code for Cordova, React Native & Web and work in the single repository
-- Can reuse pure JS implementations for keycloak, push, sync.js etc.
+- Can reuse JavaScript implementations for keycloak, push, sync.js etc.
 - No need to adjust native code (from Native SDKs) for plugin use
 - No challenges related with cross js/native communication - fetching native stateful data.
 
@@ -32,12 +32,12 @@ Provide JavaScript implementations (via a JavaScript SDK). This means the deault
 
 ### Config parsing 
 
-A Cordova config plugin is not needed due to trivial implementation that can be done in pure JavaScript.
+A Cordova config plugin is not needed due to trivial implementation that can be done in TypeScript/JavaScript.
 Networking/Logging should be done on JavaScript side as this is a common aproach for Cordova.
 
 ### Individual SDK's
 
-Depending on the SDK, a pure javascript implementation may be possible. In cases where it isn't, existing plugins can be used, or new plugins can be created for services.
+Depending on the SDK, a TypeScript/JavaScript implementation may be possible. In cases where it isn't, existing plugins can be used, or new plugins can be created for services.
 
 ## Investigation
 
@@ -49,7 +49,7 @@ Implementation: https://github.com/aerogear/aerogear-js-sdk/tree/master/packages
 
 Two options were investigated
 1. Wrapping core into plugin. 
-1. Writing pure JS helper.
+1. Writing TypeScript/JavaScript helper.
 
 Wrapping core into plugin was proven difficult and innefective:
 - JavaScript implementation is trivial
