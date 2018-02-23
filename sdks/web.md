@@ -28,28 +28,17 @@ Due to trivial implementation no need for core module like in Android and IOS.
 
 Using existing cordova plugins or creating new cordova plugins for services.
 Following example is using auth module, but behaviour should be the same for the most of the plugins.
-Example:
+For example see contributing guide:
 
-```
-var configString = require('mobile-config.json')
-var core = require('@aerogearservices/core')
-var auth = require('@aerogearservices/auth')
+https://github.com/aerogear/aerogear-js-sdk/blob/master/docs/contributing-guide.adoc
 
-var keycloakConfig = core.config(configString).getKeyCloakConfig()
+## Investigation
 
-auth.init(keycloak)
-
-// Using 
-auth.login()
-// Allow to retrieve token in javascript.
-auth.getToken()
-```
-
-## Investigation process
-
-Source code: https://github.com/aerogear/aerogear-web-sdk
+POC source code: https://github.com/aerogear/aerogear-js-sdk
 
 ### POC for Core
+
+Implementation: https://github.com/aerogear/aerogear-js-sdk/tree/master/packages/core
 
 Two options were investigated
 1. Wrapping core into plugin. 
