@@ -56,6 +56,8 @@ The sidecar will be written in Go and utilise a kubernetes client for watching &
 It will use a SerivceAccount for auth when watching resources.
 The sidecar will also use a ServiceAccount to access the UPS Admin REST API for reading & updating UPS resources.
 
+### Syncing
+
 Syncing will happen *from* OpenShift *to* UPS for the following resources:
 
 * MobileClient => Variant
@@ -76,6 +78,19 @@ Any manual changes this annotation will be overwritten by the sidecar when it ne
 
 To faciliate this syncing, a single Push Application will be created in UPS for all Mobile Clients in that OpenShift namespace.
 This Push Application will be created on provision (in the APB).
+
+### Multi-variant Mobile Clients
+
+A single Mobile Client may not always map to a single Variant in UPS.
+For example, a Cordova Mobile Client could have many Variants e.g. Android, iOS, Windows Phone.
+Similarly with a React Native Mobile Client, there may be both an Android & iOS Variant.
+
+One solution to this is to create and sync all supported Variants for these kind of Mobile Clients.
+For example, if a Cordova Mobile Client is created, it will create both an Android & iOS variant, and keep them synced.
+
+This presents another problem when generating the mobile-services.json file from the Mobile CLI or UI.
+A solution to this is to include all variant configs for the Cordova app in the mobile-services.json file.
+The SDK would then need to pick out the appropriate variant config from the mobile-services config, depending on the platform, and configure the Cordova SDK.
 
 ## Binding to UPS for server-side Integration
 
