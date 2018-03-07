@@ -6,32 +6,34 @@ This proposal outlines some developer experience issues with provisioning, setti
 
 ## Problem Description
 
+Rather than highlighting problems, User Stories will be used to capture improvements and value that can be added that makes for a better overall experience when using UPS on OpenShift
+
+*As a developer, I want UPS running in my OpenShift namespace, ready to go without any additional setup so I can start to use it immediately*
+
 The Unified Push Server is made up of a Java application & a database (MySQL).
 It also has a dependecy on an auth provider (currently Keycloak) for users of the UPS Administration UI or REST API.
-There are docker images available for UPS.
-There is also a proof of concept UPS Ansible Playbook Bundle (APB) available.
+There is a proof of concept UPS Ansible Playbook Bundle (APB) available.
 However, the APB just provisions UPS and MySQL currently.
 It expects an existing Keycloak instance to be running somewhere with the appropriate Realm, Client & Roles already setup.
+This can be improved to eliminate any additional setup or prerequisites required from the developer.
 
-The second problem is the lack of a consistent login experience when compared to other services (e.g. Jenkins, Prometheus, Grafana).
-As detailed in [Sign On Proposal](../auth/developer-single-sign-on-across-mobile-services.md), the goal is to have a consistent login experience by logging in using OpenShift credentials.
+*As a developer, I want a consistent login experience across all Mobile Services so that I can easily login with the same credentials to administer my services*
 
-The third problem is the switch in context and terms between creating Mobile Clients & Services in OpenShift, and setting up, configuring & integrating Apps with UPS Push Applications/Variants for Push messages.
+As detailed in [Sign On Proposal](../auth/developer-single-sign-on-across-mobile-services.md), a goal with all Mobile Services is to have a consistent login experience by logging in using OpenShift credentials.
+This currently isn't the case as a separate User in Keycloak is used.
+
+*As a developer, I want a simplified setup of Push variants in UPS so that I don't have to manually define them and link them back to Mobile Clients in OpenShift*
+
+Currently there is a switch in context and terms between creating Mobile Clients in OpenShift, and setting up Push Applications & Variants in UPS.
 The developer creates a 'Mobile Client' in OpenShift as a logical construct to represent the App they are developing outside of OpenShift.
-In UPS, the developer creates a 'Push Application' and 1 or more 'Variants' depending on the number & type of Apps they are developing outside of Openshift.
-The developer also has to somehow get the Push configuration from UPS and into their App.
+In UPS, the developer creates a 'Push Application' and 1 or more 'Variants' to represent the App they are developing outside of OpenShift.
+There is duplication of logical constructs and potential confusion between what Mobile Client is and what a Push Application is.
 
-The fourth problem is allowing a developer to write custom logic that dynamically sends Push messages to App users.
-This can be done by calling the UPS REST API with the correct creentials/API Key.
-However, configuration is required in UPS to get these credentials.
-These credentials then need to be managed and exposed to the custom code.
+The developer also has to somehow get the Push configuration from UPS and place it into their App for consumption by the SDK. With the mobile-services.json approach being used by the Mobile CLI/UI and the SDKs for configuration, there's some things that can be done to simplify what the developer has to do here.
 
-All of these problems highlight pain points in the developer experience.
-These problems don't block the developer, but do make it harder than it could be to add Push integration to their Apps. 
+*As a developer, I want to write custom logic for sending Push messages so that I can dynamically send messages based on varying factors and inputs*
 
-## Terms
-
-- TODO
+Push messages can be sent by calling the [sender API](https://aerogear.org/docs/specs/aerogear-unifiedpush-rest/index.html#397083935) with the correct key. There are features available in the OpenShift and the Catalog that can simplify the provisoining of a custom service, and obtaining secret credentials (like a key) from a provisioned service.
 
 ## OAuth provider support 
 
@@ -110,3 +112,11 @@ To address the fourth problem, an APB 'bind' task will be used.
 The 'bind' task will create an admin API key in UPS, and pass it back to the catalog to be stored as a secret.
 This secret can then be mounted into any custom service running in OpenShift.
 This is a standard flow for a 'bind' task when writing APBs.
+
+
+## Potential future work
+
+Building on the UPS and OpenShfit Integrations in this proposal, there is potential for future work in the Origin Web Console to help with setting up Push variants.
+This could include screens for uploading a p12 cert or secret key, which automatically get synced to UPS.
+These screens could provide a more cohesive view of a Mobile Client between whats in OpenShift and what's in UPS.
+This is very similar to what was done from the [Build Farm proof of concept](https://www.redhat.com/archives/feedhenry-dev/2017-October/msg00069.html) to provide hooks into Jenkins and tying it all back to a single Mobile Client representation.
