@@ -76,6 +76,12 @@ However, this JSON object isn't part of the generated mobile-services.json file 
 This JSON config will be read from UPS and synced back as an annotation on the associated MobileClient in OpenShift.
 Any manual changes this annotation will be overwritten by the sidecar when it next syncs.
 
+```json
+{
+  // TODO: example mobile-services.json structure with a single variant
+}
+```
+
 To faciliate this syncing, a single Push Application will be created in UPS for all Mobile Clients in that OpenShift namespace.
 This Push Application will be created on provision (in the APB).
 
@@ -91,6 +97,12 @@ For example, if a Cordova Mobile Client is created, it will create both an Andro
 This presents another problem when generating the mobile-services.json file from the Mobile CLI or UI.
 A solution to this is to include all variant configs for the Cordova app in the mobile-services.json file.
 The SDK would then need to pick out the appropriate variant config from the mobile-services config, depending on the platform, and configure the Cordova SDK.
+
+```json
+{
+  // TODO: example mobile-services.json structure with multiple variants
+}
+```
 
 ## Binding to UPS for server-side Integration
 
