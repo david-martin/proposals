@@ -123,7 +123,7 @@ A follow on flow would be:
 ```
 
 The developer is free to choose which Variants, from all available Variants in the Push Appplication in UPS, are linked to each Mobile Client.
-The are also free to create as many Variants as they want, but only link a single variant type at a time to a MobileClient.
+The are also free to create as many Variants as they want, but only link one of each Variant type to a MobileClient.
 
 For example, the following relations are possible:
 
