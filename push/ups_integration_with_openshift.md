@@ -12,7 +12,7 @@ Rather than highlighting problems, User Stories will be used to capture improvem
 
 The Unified Push Server is made up of a Java application & a database (MySQL).
 It also has a dependecy on an auth provider (currently Keycloak) for users of the UPS Administration UI or REST API.
-There is a proof of concept UPS Ansible Playbook Bundle (APB) available.
+There is a proof of concept [UPS Ansible Playbook Bundle](https://github.com/aerogearcatalog/unifiedpush-apb) (APB) available.
 However, the APB just provisions UPS and MySQL currently.
 It expects an existing Keycloak instance to be running somewhere with the appropriate Realm, Client & Roles already setup.
 This can be improved to eliminate any additional setup or prerequisites required from the developer.
@@ -22,7 +22,7 @@ This can be improved to eliminate any additional setup or prerequisites required
 As detailed in [Sign On Proposal](../auth/developer-single-sign-on-across-mobile-services.md), a goal with all Mobile Services is to have a consistent login experience by logging in using OpenShift credentials.
 This currently isn't the case as a separate User in Keycloak is used.
 
-*As a developer, I want a simplified setup of Push variants in UPS so that I don't have to manually define them and link them back to Mobile Clients in OpenShift*
+*As a developer, I want a to setup Push variants and link them to Mobile Clients in OpenShift so that I can get Push notifications working as fast & easy as possible with my Mobile Clients*
 
 Currently there is a switch in context and terms between creating Mobile Clients in OpenShift, and setting up Push Applications & Variants in UPS.
 The developer creates a 'Mobile Client' in OpenShift as a logical construct to represent the App they are developing outside of OpenShift.
@@ -37,78 +37,108 @@ Push messages can be sent by calling the [sender API](https://aerogear.org/docs/
 
 ## OAuth provider support 
 
-To address the first & second problem, UPS will be modified to support different auth providers.
+To address the first & second stories, UPS will be modified to support different auth providers.
 The 2 providers will be Keycloak (to maintain backwards compatibility for existing users) and a generic OAuth Provider.
-The OAuth flow will follow the same pattern & flow used by the [OpenShift OAuth Proxy](https://github.com/openshift/oauth-proxy).
-The UPS APB will need to be modified to include an OAuth ServiceAccount, similar to how [Jenkins uses a ServiceAccount](https://github.com/openshift/jenkins-openshift-login-plugin#browser-access).
-UPS will use this ServiceAccount as an OAuth Client to verify the User has the necessary permissions in OpenShift to use UPS.
-The permissions will be:
-* edit access on the namespace in OpenShift => Standard Developer Account in UPS
-* admin access on the namespace in OpenShift => Admin Account in UPS
+The OAuth flow will follow the same pattern & flow as [Prometheus](https://github.com/aerogearcatalog/metrics-apb/blob/9b4cb90988f5f3e7a28a84050cf274355cd36498/roles/provision-metrics-apb/tasks/provision-prometheus.yml#L36-L52) with the [OpenShift OAuth Proxy](https://github.com/openshift/oauth-proxy).
+The UPS APB will be modified to include an OAuth ServiceAccount and the OAuth Proxy container.
+UPS will be modified to allow running in 'no auth' mode i.e. the UI & API will be uprotected and give 'admin' access to the UPS instance running in the user's namespace. The OAuth Proxy will sit in front of UPS providing authentication and autorisation based on namespace permissions.
+
+A future change to this could look at adding support for individual 'developer' users.
+This would be required if running UPS as a shared service.
+That would most likely require changes to UPS to call OpenShift to check user permissions based on the token header, and only showing that developers Push Applications.
 
 These changes will mean UPS will no longer have a dependency on Keycloak when running in OpenShift.
-Minimal changes will be required to the UPS APB.
 Also, the developer doesn't have to know about or be concerned with where or how the auth provider is setup and configured for UPS.
 
-## OpenShift Integration
+## OpenShift UI Integration
 
-To address the third problem, a sidecar will be added to the UPS APB.
-This sidecar will provide background bi-directional syncing of resources and metadata between OpenShift and UPS.
-The sidecar will be written in Go and utilise a kubernetes client for watching & updating Kubernetes resources.
-It will use a SerivceAccount for auth when watching resources.
-The sidecar will also use a ServiceAccount to access the UPS Admin REST API for reading & updating UPS resources.
+To address the third story, a number of UI screens and integration points will be added to the OpenShift UI & the UPS APB.
 
-### Syncing
+Here is an example workflow showing the UI touchpoints and the idea of 'linking' Variants to MobileClients in OpenShift:
 
-Syncing will happen *from* OpenShift *to* UPS for the following resources:
-
-* MobileClient => Variant
-* Secret (p12 or secret key) => Variant configuration
-
-The Secrets will have an appropriate label so it can be easily filtered when looking for resources to sync.
-The sidecar will overwrite the Variant fields and configuration to match what the values are in OpenShift.
-This means that any changes to a Variant directly in the UPS UI will be overwritten on next sync.
-
-Syncing will happen *from* UPS *to* OpenShift for the following resources:
-
-* Variant push configuration (JSON) => MobileClient annotation
-
-In UPS, a JSON object with Push configuration for a Variant is available.
-However, this JSON object isn't part of the generated mobile-services.json file from the Mobile CLI or UI.
-This JSON config will be read from UPS and synced back as an annotation on the associated MobileClient in OpenShift.
-Any manual changes this annotation will be overwritten by the sidecar when it next syncs.
+* developer creates a Cordova App (MobileClient) in OpenShift
+* developer provisions UPS from the Catalog
+* developer sets up the FCM/Android credentials for push for the Cordova App via *new* UI screens in OpenShift
+* this creates an Android variant in UPS (details of how this happens TBD) and links it to the Mobile Client (details of how this 'link' works TBD)
+* the Variant config is retrieved from UPS and stored in/with the Cordova App resource (MobileClient)
+* the generated mobile-services.json file includes the correct Variant config
 
 ```json
 {
-  // TODO: example mobile-services.json structure with a single variant
+  "version": 1,
+  "clusterName": "https://example.com",
+  "namespace": "myproject",
+  "clientId": "app-cordova",
+  "services": [
+    {
+      "id": "ups",
+      "name": "ups",
+      "type": "ups",
+      "url": "https://ups.example.com",
+      "config": {
+        "android": {
+          "variantId": "some-variant-id",
+          "variantSecret": "some-secret",
+          "senderId": "some-sender-id"
+        }
+      }
+    }
+  ]
 }
 ```
 
-To faciliate this syncing, a single Push Application will be created in UPS for all Mobile Clients in that OpenShift namespace.
-This Push Application will be created on provision (in the APB).
+A follow on flow would be:
 
-### Multi-variant Mobile Clients
-
-A single Mobile Client may not always map to a single Variant in UPS.
-For example, a Cordova Mobile Client could have many Variants e.g. Android, iOS, Windows Phone.
-Similarly with a React Native Mobile Client, there may be both an Android & iOS Variant.
-
-One solution to this is to create and sync all supported Variants for these kind of Mobile Clients.
-For example, if a Cordova Mobile Client is created, it will create both an Android & iOS variant, and keep them synced.
-
-This presents another problem when generating the mobile-services.json file from the Mobile CLI or UI.
-A solution to this is to include all variant configs for the Cordova app in the mobile-services.json file.
-The SDK would then need to pick out the appropriate variant config from the mobile-services config, depending on the platform, and configure the Cordova SDK.
+* developer sets up iOS credentials for push for the same Codova App via *new* UI screens in OpenShift
+* this creates an iOS variant in UPS and links it to the Mobile Client
+* the Variant config is retrieved from UPS and stored in/with the Cordova App resource (MobileClient)
+* the generated mobile-services.json file now includes the correct Variants config
 
 ```json
 {
-  // TODO: example mobile-services.json structure with multiple variants
+  "version": 1,
+  "clusterName": "https://example.com",
+  "namespace": "myproject",
+  "clientId": "app-cordova",
+  "services": [
+    {
+      "id": "ups",
+      "name": "ups",
+      "type": "ups",
+      "url": "https://ups.example.com",
+      "config": {
+        "android": {
+          "variantId": "some-variant-id",
+          "variantSecret": "some-secret",
+          "senderId": "some-sender-id"
+        },
+        "ios": {
+          "variantId": "some-variant-id",
+          "variantSecret": "some-secret"
+        }
+      }
+    }
+  ]
 }
 ```
+
+The developer is free to choose which Variants, from all available Variants in the Push Appplication in UPS, are linked to each Mobile Client.
+The are also free to create as many Variants as they want, but only link a single variant type at a time to a MobileClient.
+
+For example, the following relations are possible:
+
+* an Android Mobile Client with and Android Variant
+* a Cordova Mobile Client with just an iOS Variant
+* a Cordova Mobile Client with an iOS Variant and Android Variant
+* a Xamarin Mobile Client with a Windows Variant and Android Variant
+
+But the following would not be possible:
+
+* a Cordova Mobile client with 2 Android Variants (The developer should switch between Variants as desired and use just 1 at a time)
 
 ## Binding to UPS for server-side Integration
 
-To address the fourth problem, an APB 'bind' task will be used.
+To address the fourth story, an APB 'bind' task will be used.
 The 'bind' task will create an admin API key in UPS, and pass it back to the catalog to be stored as a secret.
 This secret can then be mounted into any custom service running in OpenShift.
 This is a standard flow for a 'bind' task when writing APBs.
