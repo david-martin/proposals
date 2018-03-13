@@ -142,11 +142,3 @@ To address the fourth story, an APB 'bind' task will be used.
 The 'bind' task will create an admin API key in UPS, and pass it back to the catalog to be stored as a secret.
 This secret can then be mounted into any custom service running in OpenShift.
 This is a standard flow for a 'bind' task when writing APBs.
-
-
-## Potential future work
-
-Building on the UPS and OpenShfit Integrations in this proposal, there is potential for future work in the Origin Web Console to help with setting up Push variants.
-This could include screens for uploading a p12 cert or secret key, which automatically get synced to UPS.
-These screens could provide a more cohesive view of a Mobile Client between whats in OpenShift and what's in UPS.
-This is very similar to what was done from the [Build Farm proof of concept](https://www.redhat.com/archives/feedhenry-dev/2017-October/msg00069.html) to provide hooks into Jenkins and tying it all back to a single Mobile Client representation.
