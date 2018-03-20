@@ -54,13 +54,58 @@ Also, the developer doesn't have to know about or be concerned with where or how
 
 To address the third story, a number of UI screens and integration points will be added to the OpenShift UI & the UPS APB.
 
-Here is an example workflow showing the UI touchpoints and the idea of 'linking' Variants to MobileClients in OpenShift:
+Push Variant credentials will be stored in OpenShift as a Secret.
+The Secret will have:
+
+* a label to identify it as storing Variant credentials
+* an annotation to link to a specific Mobile Client `aerogear.org/mobile-client-id`
+* an annotation to store the ID of the Variant in UPS `aerogear.org/variant-id`
+* an annotation to store the Variant config from UPS `aerogear.org/variant-config-json`
+* a generated name in the format `variant-<variant-type>-<timestamp>`
+
+Example Variant Secret:
+
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  annotations:
+    aerogear.org/mobile-client-id: 334e1333b5d4-e114-4332-8332-337c4111
+    aerogear.org/variant-id: 337c42c5-f444-4762-89ef-334e1684b5d4
+    aerogear.org/variant-config-json: >-
+      {"variantId":"some-variant-id","variantSecret":"some-secret","senderId":some-sender-id"}
+  labels:
+    variant: true
+  name: variant-android-334e1333b5d4-e114-4332-8332-337c4111-151222332230
+  namespace: myproject
+type: Opaque
+data:
+  googleKey: >-
+    \c3VwZXJzZWNyZXQK
+```
+
+A sidecar will be used to sync these Push Variant credentials from OpenShift to UPS.
+The Variant ID and Config will be set by the sidecar after creation of the Variant in UPS.
+OpenShift will be the source of truth for Variants linked to Mobile Clients.
+The sycning process in the sidecar will need to consider:
+
+* Syncing *From* OpenShift *to* UPS
+  * New Secrets mean a New Variant is created
+  * Updates to Secrets overwrite the Variant
+  * Deleting a Secret will delete the Variant
+  * Deleting a Variant directly in UPS will cause it to be recreated
+* Syncing *From* UPS *to* OpenShift
+  * Variant ID will be annotated on the Secret after creation
+  * Variant Config will be annotated on the Secret and kept up to date (UPS is the source of truth for this config)
+
+Here is an example workflow showing the UI touchpoints:
 
 * developer creates a Cordova App (MobileClient) in OpenShift
 * developer provisions UPS from the Catalog
 * developer sets up the FCM/Android credentials for push for the Cordova App via *new* UI screens in OpenShift
-* this creates an Android variant in UPS (details of how this happens TBD) and links it to the Mobile Client (details of how this 'link' works TBD)
-* the Variant config is retrieved from UPS and stored in/with the Cordova App resource (MobileClient)
+* this creates a Secret to store those credentials
+* the UPS sidecar syncs these credentials from the Secret to a new Android Variant in UPS
+* the Variant config is retrieved from UPS and stored an annotation on the Secret
 * the generated mobile-services.json file includes the correct Variant config
 
 ```json
@@ -90,9 +135,10 @@ Here is an example workflow showing the UI touchpoints and the idea of 'linking'
 A follow on flow would be:
 
 * developer sets up iOS credentials for push for the same Codova App via *new* UI screens in OpenShift
-* this creates an iOS variant in UPS and links it to the Mobile Client
-* the Variant config is retrieved from UPS and stored in/with the Cordova App resource (MobileClient)
-* the generated mobile-services.json file now includes the correct Variants config
+* these credentials as stored in the Secret
+* on next sync (in the sidecar), an iOS variant is created in UPS
+* the Variant config is retrieved from UPS and stored as annotations in the Secret
+* the generated mobile-services.json file now includes both the iOS and Android Variants config
 
 ```json
 {
