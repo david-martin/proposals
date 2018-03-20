@@ -57,8 +57,8 @@ To address the third story, a number of UI screens and integration points will b
 Push Variant credentials will be stored in OpenShift as a Secret.
 The Secret will have:
 
-* a label to identify it as storing Variant credentials
-* an annotation to link to a specific Mobile Client `aerogear.org/mobile-client-id`
+* a label to identify it as storing Variant credentials `variant: true`
+* a label to link to a specific Mobile Client `mobileClient`
 * an annotation to store the ID of the Variant in UPS `aerogear.org/variant-id`
 * an annotation to store the Variant config from UPS `aerogear.org/variant-config-json`
 * a generated name in the format `variant-<variant-type>-<timestamp>`
@@ -70,12 +70,12 @@ apiVersion: v1
 kind: Secret
 metadata:
   annotations:
-    aerogear.org/mobile-client-id: 334e1333b5d4-e114-4332-8332-337c4111
     aerogear.org/variant-id: 337c42c5-f444-4762-89ef-334e1684b5d4
     aerogear.org/variant-config-json: >-
       {"variantId":"some-variant-id","variantSecret":"some-secret","senderId":some-sender-id"}
   labels:
     variant: true
+    mobileClient: 334e1333b5d4-e114-4332-8332-337c4111
   name: variant-android-334e1333b5d4-e114-4332-8332-337c4111-151222332230
   namespace: myproject
 type: Opaque
