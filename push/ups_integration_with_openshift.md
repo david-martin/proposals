@@ -105,7 +105,7 @@ Here is an example workflow showing the UI touchpoints:
 * developer sets up the FCM/Android credentials for push for the Cordova App via *new* UI screens in OpenShift
 * this creates a Secret to store those credentials
 * the UPS sidecar syncs these credentials from the Secret to a new Android Variant in UPS
-* the Variant config is retrieved from UPS and stored an annotation on the Secret
+* the Variant config is retrieved from UPS and stored in an annotation on the Secret
 * the generated mobile-services.json file includes the correct Variant config
 
 ```json
@@ -135,7 +135,7 @@ Here is an example workflow showing the UI touchpoints:
 A follow on flow would be:
 
 * developer sets up iOS credentials for push for the same Codova App via *new* UI screens in OpenShift
-* these credentials as stored in the Secret
+* these credentials are stored in a new Secret
 * on next sync (in the sidecar), an iOS variant is created in UPS
 * the Variant config is retrieved from UPS and stored as annotations in the Secret
 * the generated mobile-services.json file now includes both the iOS and Android Variants config
@@ -168,19 +168,19 @@ A follow on flow would be:
 }
 ```
 
-The developer is free to choose which Variants, from all available Variants in the Push Appplication in UPS, are linked to each Mobile Client.
-The are also free to create as many Variants as they want, but only link one of each Variant type to a MobileClient.
-
+For a first iteration of this, it will be possible to create at most 1 of each variant type that is relevant to the Mobile Client.
 For example, the following relations are possible:
 
-* an Android Mobile Client with and Android Variant
+* an Android Mobile Client with an Android Variant
 * a Cordova Mobile Client with just an iOS Variant
 * a Cordova Mobile Client with an iOS Variant and Android Variant
-* a Xamarin Mobile Client with a Windows Variant and Android Variant
+* a Xamarin Mobile Client with an iOS Variant and Android Variant
 
 But the following would not be possible:
 
-* a Cordova Mobile client with 2 Android Variants (The developer should switch between Variants as desired and use just 1 at a time)
+* a Cordova Mobile client with 2 Android Variants (The developer should modify the variant to include the credentials they want at that point in time)
+
+Future work could include allowing multiple Variants of a type to be created, and switching between which Variant is currently associated with a Mobile Client.
 
 ## Binding to UPS for server-side Integration
 
