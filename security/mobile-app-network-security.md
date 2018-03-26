@@ -115,6 +115,12 @@ Based on the information above, and the fact that we want to find a solution tha
 
 2. During the app runtime, when the AeroGear SDK is initialised, it will parse the configuration file, and configure the HTTP client to use the specified certificate pins or support self-signed certificates automatically.
 
-3. The mobile CLI tool will also be updated to automatically generate the above configurations based on the CLI flags. Both features will be disabled by default. Once enabled, it will generate certificate pins for all the AeroGear backend services that are enabled for the app. In the future, we will allow developers to select which service should use certificate pinning.
+    * For Android, the [okhttp](http://square.github.io/okhttp/) library will be configured to use the provided Keystore files (if any) and the certificate pins.
+    * For iOS, if self-signed certificate is enabled, the [Alamofire](https://github.com/Alamofire/Alamofire) library will not validate the certificates against CAs at all. It will just perform certificate pin comparsions.
+    * For Cordova, it is likely we will not be able to support self-signed certs from apps, and it has to be done at the OS level. This is mainly due to the lack of customisation support by the XMLHTTPRequest objects in webviews. We might be able to support certificate pinning though, by using a plugin to allow developers to manually invoke a request to a URL using the native HTTP client before starting the request in the Webview.
+    * Not sure about what we can do for Xamarin yet.
+
+
+3. The mobile CLI tool will also be updated to automatically generate the above configurations (and possibly keystore files) based on the CLI flags. Both features will be disabled by default. Once enabled, it will generate certificate pins for all the AeroGear backend services that are enabled for the app. In the future, we will allow developers to select which service should use certificate pinning.
 
 4. Documentations will also be provided to callout some of the risks and pitfalls of using these features to help developers make better decisions.
