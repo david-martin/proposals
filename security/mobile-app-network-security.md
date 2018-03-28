@@ -8,7 +8,7 @@ We will first look at some of the use cases in order to define the problems, and
 
 ## Primary Goal
 
-* Reach agreement on a solution that can help mobile developers properly handle network security in their mobile apps that consume AeroGear services
+* A solution that can help mobile developers properly handle network security in their mobile apps that consume AeroGear services
 
 ## Secondary Goal
 
@@ -26,7 +26,7 @@ The main use cases that will be discussed in this document are:
 
 1. As a mobile developer, I want to use AeroGear services in my mobile apps. I have the AeroGear service running locally with HTTPS, and I want to test against the local services from my mobile app on an actual device.
 
-2. As an enterprise mobile developer, I need to develop a mobile app for internal use. I need to make sure my mobile app can connect to AeroGear services that are running with the organisation's own HTTPS certificates.
+2. As an enterprise mobile developer, I need to develop a mobile app for internal use. I need to make sure my mobile app can connect to AeroGear services that are running with the organisation's self-signed certificates.
 
 3. As a mobile developer of a finance institution, I need to develop a mobile app that uses the AeroGear services for the customers of the organisation. However, due to highly sensitive nature of the data, I need to make sure that no one (including the app users themselves) can inspect the network data of the app.
 
@@ -46,7 +46,7 @@ If you already know quite well about the problems, then you can skip this sectio
 
 To consume AeroGear services, mobile apps will use the AeroGear SDKs, which use HTTP/HTTPS to communicate with the backend services. In most cases, HTTPS is used to ensure the security of the data during transimission. 
 
-When the HTTPS connection is established, the HTTP client on the device will need some way to verify the the authencitiy of the server. This is done by checking the server's certificate during the handshake between the client and the server. 
+When the HTTPS connection is established, the HTTPS client on the device will need some way to verify the the authencitiy of the server. This is done by checking the server's certificate during the handshake between the client and the server. 
 
 In most cases, the server should have a certificate that is signed by a trusted CA to confirm the identity of the server. The HTTP client can then use the trusted CAs' certificates that are pre-installed on the device to verify the server's certificate.
 
@@ -54,7 +54,7 @@ However, due to various reasons (like cost, and sometimes it is just not necessa
 
 In use case #1, when the AeroGear services are running locally, they will be using self-signed certificates by default. This means developers will not be able to connect to these services from their mobile devices by default.
 
-To solve this problem, all the modern OSes allow users install self-signed CA certificates on their devices and trust them. However, there is a side effect: it is possible for attackers to take advantages of it and perform man-in-the-middle attacks.
+To solve this problem, all the modern mobile OSes allow users install self-signed CA certificates on their devices and trust them. However, there is a side effect: it is possible for attackers to take advantages of it and perform man-in-the-middle attacks.
 
 ### Problem 2: Prevent Man-in-the-middle attack
 
@@ -64,7 +64,7 @@ For example, user A is an experienced hacker and he wants to hack into the backe
 
 Next, he set up a proxy server using tools like [Charles proxy server](https://www.charlesproxy.com/). He install the proxy server's certificate on his own device, and pointed the device to use the proxy server. Since the proxy server's certificate is now trusted on his device, the HTTP client will allow HTTPS connection to the proxy server, and user A can see all the traffic data between the client and the server. With this information, user A is now able to initiate attacks against the bank's backend system.
 
-In this example, the user of the app wants to become the attacker. But more seriously, this type of attacks can be performed without permissions from users. For example, a hacker can setup a malicious WIFI hotspot, acting like a proxy server, and ask users to install the self-signed certficates to their devices in exchange for the free connection. If users don't know what they are doing, they could endup installing the self-signed certificates and connecting to the WIFT, and thus give the hacker the opportunity to eavesdrop all the HTTPS traffic, and steal important data, without them realising it.
+In this example, the user of the app wants to become the attacker. But more seriously, this type of attacks can be performed without permissions from users. For example, a hacker can setup a malicious WIFI hotspot, acting like a proxy server, and ask users to install the self-signed certficates to their devices in exchange for the free connection. If users don't know what they are doing, they could endup installing the self-signed certificates and connecting to the WIFI, and thus give the hacker the opportunity to eavesdrop all the HTTPS traffic, and steal important data, without them realising it.
 
 To prevent this type of attacks, a technique called "Certificate Pinning" is being used. The idea is that for most of the applications, they will talk to backend servers that are controlled by the same developers. Given the fact that each certificate is unique, at the application build time, the developers can generate "fingerprints" of the certificates of their backend services and "pin" them in the app. Then when the application is trying to establish the HTTPS connection, in addition to the default certificate checks, the HTTP client will also compute the "fingerprints" of the certificates and compare it againsted the "pinned" ones. If they are not matching, then the HTTP client knows that it is actually not talking to the real backend server, and thus refuse to setup the connection.
 
