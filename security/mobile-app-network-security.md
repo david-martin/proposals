@@ -4,7 +4,7 @@ In this document we will discuss some of the common problems around network secu
 
 We will first look at some of the use cases in order to define the problems, and then look at some of the options to solve them. Finally the proposed solution will be presented.
 
-# Goals
+# Goals of the proposal
 
 ## Primary Goal
 
