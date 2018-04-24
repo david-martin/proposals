@@ -6,11 +6,12 @@ This document outlines what is needed to provide a set of the SDK's that can be 
 
 ### Primary Goals
 
-* Provide SDKs (Core, Metrics, Auth etc..) for Mobile Developers to allow them to integrate Cordova, React Native & Web applications into Mobile Services.
+* Provide SDKs (Core, Metrics, Auth etc..) for Mobile Developers to allow them to integrate Cordova & Web applications into Mobile Services.
 
 ### Secondary Goals
 
-* Reuse as much JavaScript as possible between the 3 different target platforms
+* Reuse as much JavaScript as possible between the different target platforms
+* Provide modules that are compatible with React Native applications
 * Provide mechanisms for feature-parity with a similar API between all target platforms considering their differences
 
 ## Problem Description
@@ -21,7 +22,7 @@ The 3 target platforms (Cordova, React Native & Web) all support JavaScript as t
 
 Provide JavaScript implementations (via a JavaScript SDK). This means the default way of implementing an SDK interface will be in JavaScript. However, this may not always be possible. 
 For the Cordova and React Native platforms we will provide a plugin that encapsulates the native code. This plugin conforms to an interface defined in the JS SDK that abstracts all the native platform specific code. Doing this will make Cordova, Web and React Native SDK's more consistent. We will bundle an
-implementation of that Interface for the Web Platform in the JS SDK. The plugins for Cordova and React Native will be separate repositories. The JS SDK requires the users to install the plugin for those Platforms and it will either try to auto-detect the platform, or require the user to pass in a `PlatformImpls` module when a service is instantiated.
+implementation of that Interface for the Web Platform in the JS SDK. The plugins for Cordova and React Native will be separate repositories. The JS SDK requires the users to install the plugin for those Platforms and it will utilize it to auto-detect the current platform at runtime.
 
 ### Advantages
 
@@ -68,7 +69,7 @@ execution environments and for graceful degradation.
 
 The following diagram shows the relationship between native plugins, JavaScript code and client App code:
 
-<!-- TODO: include diagram -->
+![JavaScript SDK Diagram](./img/diagram.svg)
 
 #### `plugin.xml` example
 
