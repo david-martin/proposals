@@ -49,7 +49,6 @@ The uploading of metrics records utilizes the networking layer provided by Core.
 
 Depending on the SDK, a TypeScript/JavaScript implementation may be possible. In cases where it isn't, existing plugins can be used, or new plugins can be created for services.
 
-
 ## Adding a module to the JS SDK
 
 New modules written JavaScript or Typescript will have the following items:
@@ -66,6 +65,10 @@ These should be exposed as a separate NPM-installable plugin that expose the req
 
 The main module then feature-checks for the existance of the native feature and deal accordingly, allowing for a single codebase to adapt to different
 execution environments and for graceful degradation.
+
+The following diagram shows the relationship between native plugins, JavaScript code and client App code:
+
+<!-- TODO: include diagram -->
 
 #### `plugin.xml` example
 
@@ -114,7 +117,10 @@ if (aerogear.platformVersion) {
 
 ### Adding native bindings to a plugin for React Native
 
+Native bindings for React Native should also be delivered as a separate NPM package and register their native modules in react-native's `NativeModules` object.
+The code in the 'main' JavaScript module should be able to check for the module's presence in order to react accordingly.
 
+Optionally these can include typing declarations or convenience JavaScript to facilitate access, but these should still allow for feature-checking by the main module.
 
 ## Investigation
 
