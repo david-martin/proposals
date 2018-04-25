@@ -123,29 +123,4 @@ The code in the 'main' JavaScript module should be able to check for the module'
 
 Optionally these can include typing declarations or convenience JavaScript to facilitate access, but these should still allow for feature-checking by the main module.
 
-## Investigation
 
-A Proof of Concept was done in the following repository: https://github.com/aerogear/aerogear-js-sdk
-
-### PoC results for the Core Module for the JS SDK
-
-Implementation: https://github.com/aerogear/aerogear-js-sdk/tree/master/packages/core
-
-Two options were investigated
-1. Wrapping core into plugin.
-1. Writing TypeScript/JavaScript helper.
-
-Wrapping core into a plugin was proven difficult and ineffective:
-- JavaScript implementation is trivial
-- Dropping configuration into native projects may be bad user experience for Cordova or React Native developers.
-- Core Android & IOS providing helpers that are available on Cordova/JavaScript
-- Only parser needed to be linked back to JavaScript
-- The way Android instantiates service will not be compatibile with Cordova 
-- Wrapping Core into Cordova plugin will put some limitations on native implementation we want to avoid.
-
-Wrapping the Android SDK in a React Native library was proven to be difficult
-- The Android SDK makes use of Java8 features that are problematic for React Native
-- The Android SDK API requirements are higher than what React Native suggests and implements in their boilerplate code
-
-JavaScript configuration parser/processor was implemented.
-This was proven to be the most efficient way to resolve configuration parsing problem.
