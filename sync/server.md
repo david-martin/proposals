@@ -28,6 +28,21 @@ The server will use the standard module mechanism, `npm`, for installing and man
 Npm `scripts` will be used extensively for running CI and local development tasks, executing cli tools directly e.g. `nodemon`, `standard`, `mocha`.
 Build tools such as `grunt` or `gulp` will *not* be used as they introduce extra overhead where a simple cli command will suffice. See https://www.keithcirkel.co.uk/how-to-use-npm-as-a-build-tool/ for more info.
 
+## Architecture
+
+The Sync server is intended to be horizontally scalable.
+As such, it will us a [shared-nothing-architecture](https://en.wikipedia.org/wiki/Shared-nothing_architecture).
+In addition, the server will be developed following the [12 factor app](https://12factor.net/) pattern.
+The architecture will be kept simple, where appropriate.
+There will be a single server process which serves as the following:
+
+* Static file server for the Admin UI
+* API for managing the Data Schema and other GraphQL & Data Sync features
+* GraphQL API for Apps to send Queries & Mutations to
+* Subscriptions endpoint for Apps to connect to
+
+TODO: Updated architecture diagram based on https://docs.google.com/drawings/d/1OmMY1bbI8HDhlZ_cIirv7FYTEqRRV-Hh-g0ANtYEgBY/edit
+
 The main developer flow when using the Sync Server will be something like this:
 
 * Open the Data Sync Admin UI
@@ -41,7 +56,7 @@ This implies a fast feedback loop when developing your Data Schema.
 To ensure the feedback loop is as fast as possible, the architecture of sync will be slightly different that the proof of concept architecture.
 Both the backend for the Admin UI, and the GraphQL API that Apps talk to will be part of the 1 Data Sync server.
 This server will continously run, without any restart needed when the Data Schema changes.
-To facilitate this, the mounting of the graphql express middleware will need to be done in such a way that it always rebuilds the schema based on the latests available e.g.
+To facilitate this, the mounting of the graphql express middleware will need to be done in such a way that it always rebuilds the schema based on the latests available. In reality, the parsed schema should be cached, and only reloaded/reparsed if it has changed. Here is a sample graphql endpoint mounting in express:
 
 ```
 const tracing = true
@@ -52,8 +67,19 @@ app.use('/graphql', bodyParser.json(), function (req, res, next) {
 })
 ```
 
-In reality, the parsed schema should be cached, and only reloaded/reparsed if it has changed.
-More info here https://stackoverflow.com/questions/48261057/graphql-apollo-server-hot-update-schema
+As the server needs to store resources, such as the Data Schema, Resolver Mappings and Webhooks, a data store is required.
+The Data Sync server is intended to run in a Kubernetes environment such as Openshift.
+This allows the Data Sync server to use a ServiceAccount token to save these resources in 1 or more Secrets.
+This will avoid the need for a potentially heavyweight database, at least until something different is required.
+
+A pubsub service will be required for managing the event driven nature of Subscriptions when the Data Sync server is scaled beyond 1 Replica.
+A reasonable candidate for this is Redis and its set of [pubsub commands](https://redis.io/topics/pubsub).
+Any Clients interested in a particular event/subscription will connect via websocket to the server.
+Each server replica will connect to the same redis instance and subscribe to relevant 'Subscription' events, and notify connected clients of those events.
+
+The Admin UI will be written in React, and use Patternfly for the look & feel.
+See https://github.com/patternfly/patternfly-react & https://github.com/patternfly/patternfly-react-demo-app for more info on the technology.
+See [Sync UI](./ui.md) for more info on the Admin UI Architecture
 
 ## PostgreSQL Connector
 
@@ -343,7 +369,7 @@ type Subscription {
 }
 ```
 
-An example subsubscrition request from a Client would look like the following:
+An example subscrition request from a Client would look like the following:
 
 ```
 subscription noteCreatedForOwner6 {
