@@ -232,17 +232,72 @@ However, for a `remove` operation, the nedb API returns a `numRemoved` value. Th
 
 ## Metrics
 
+The primary goals of Data Sync metrics are:
+
+* seeing resource usage of the Data Sync service over time
+* summary metrics about the number of queries/mutations resolved by the server
+* getting an insight into what Clients are connected/executing queries over time, the number of queries/mutations, which queries/mutations, and the size of data
+  * Clients connected for Subscriptions, over websocket, may be a good way of determining when a client is connected and condition of their network
+* being able to get Client specific information for debugging purposes e.g. a count of pending mutations that have built up while offline (depends on an offline mutation queueing feature)
+
+The above is not intended to limit what metrics to capture, but more as a starting point to discover what metrics are valueable.
+
 ### Client Metrics
 
-x
+There are 2 potential approaches to getting Client Metrics from a device to the Metrics service. The first approach is to use the MetricsService module in the AeroGear SDK to send metrics directly to the Metrics service. This would mean the Sync module in the SDK would need to call the Metrics service every so often.
+This is not a great approach as the device may not be online all the time.
+
+The second approach is to piggyback on any GraphQL requests, adding metrics data to the request context. The data will need to be limited in size to avoid unnecessary network overhead. Using simple counters that are maintained on the Client will help keep the payload size small. For example, the Sync module in the SDK maintains a specific set of counters as the App interacts with it.
+Whenever a Sync request (query/mutation) is made to the server, the latest values for this set of counters is sent along.
+On the server, these counter values are exposed via a prometheus endpoint.
+Prometheus polls the Data Sync service for these values, allowing them to be queried and visualised in Grafana.
+
+Visualisation of Client Metrics will ultimately be based on any Client specific metrics sent with each GraphQL request, and other Client specific metrics during the query/mutation resolver execution on the Server i.e. whenever the Server is resolving data for that Client. This will form the basis for some initial Grafana queries and dashboards. However, this will likely need more thought and discussion closer to the time after a steel thread is acheived.
 
 ### Server Metrics
 
-x
+Server Metrics that are not specific to a Client can also be gathered and visualised.
+This can include:
+
+* memory & CPU usage
+* resolver timings, broken down into request & response times
+
+Other metrics can be added based on their merit of being valueable to the administrator/operator of Data Sync.
 
 ## Subscriptions (for Realtime Client updates)
 
-x
+In a typical GraphQL server, a Subscription has a resolver function that notifies any connected client if a change happens.
+For example, if you have a mutation for creating a 'Note', and also want to listen for whenever any Client creates a 'Note', the schema might look like this:
+
+```
+type Note {
+  id: ID
+  content: String
+}
+
+type Mutation {
+  createNote(content: String): Note
+}
+
+type Subscription {
+  noteCreated: Note
+}
+```
+
+The `createNote` resolver function might use an in-memory pub/sub system/library to publish an event whenever it finishes successfully.
+In turn, the `noteCreated` resolver would listen for that event, and notify any connected Client about the event.
+
+As the Data Sync server is a generic GraphQL server, it has no way to know how Subscriptions relate to Queries and Mutations.
+However, with the right schema syntax, the developer can inform the server of that link by using a directive:
+
+```
+type Subscription {
+	noteCreated: Note
+		@datasync_subscribe(mutations: ["createNote"])
+}
+```
+
+
 
 ## Authentication
 
