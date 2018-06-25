@@ -20,6 +20,41 @@
 
 More information about the GraphQL terminology and schema can be found at https://graphql.org/learn/schema/
 
+## Server Technology
+
+The Sync Server will provide a GraphQL API for Apps to store and retrieve data from, based on a defined Data Schema.
+The server will be written in Node.js, leveraging various existing graphql libraries, such as `graphql`, `graphql-subscriptions`, `graphql-tools`, `apollo-server-express` and `subscriptions-transport-ws`.
+The server will use the standard module mechanism, `npm`, for installing and managing these packages.
+Npm `scripts` will be used extensively for running CI and local development tasks, executing cli tools directly e.g. `nodemon`, `standard`, `mocha`.
+Build tools such as `grunt` or `gulp` will *not* be used as they introduce extra overhead where a simple cli command will suffice. See https://www.keithcirkel.co.uk/how-to-use-npm-as-a-build-tool/ for more info.
+
+The main developer flow when using the Sync Server will be something like this:
+
+* Open the Data Sync Admin UI
+* Define the Data Schema
+* Configure Data Source(s)
+* Configure Resolvers for any Queries or Mutations
+* Update/modify the Data Schema as needed, continuously saving and trying out the Schema
+
+The last part of the flow is very important.
+This implies a fast feedback loop when developing your Data Schema.
+To ensure the feedback loop is as fast as possible, the architecture of sync will be slightly different that the proof of concept architecture.
+Both the backend for the Admin UI, and the GraphQL API that Apps talk to will be part of the 1 Data Sync server.
+This server will continously run, without any restart needed when the Data Schema changes.
+To facilitate this, the mounting of the graphql express middleware will need to be done in such a way that it always rebuilds the schema based on the latests available e.g.
+
+```
+const tracing = true
+app.use('/graphql', bodyParser.json(), function (req, res, next) {
+  const schema = require('./lib/schemaParser').parseFromFile(SCHEMA_FILE, DATA_SOURCES_FILE, RESOLVER_MAPPINGS_FILE)
+  const graphql = graphqlExpress({ schema, tracing })
+  graphql(req, res, next)
+})
+```
+
+In reality, the parsed schema should be cached, and only reloaded/reparsed if it has changed.
+More info here https://stackoverflow.com/questions/48261057/graphql-apollo-server-hot-update-schema
+
 ## PostgreSQL Connector
 
 ### Data Source
@@ -288,7 +323,7 @@ The `createNote` resolver function might use an in-memory pub/sub system/library
 In turn, the `noteCreated` resolver would listen for that event, and notify any connected Client about the event.
 
 As the Data Sync server is a generic GraphQL server, it has no way to know how Subscriptions relate to Queries and Mutations.
-However, with the right schema syntax, the developer can inform the server of that link by using a directive:
+However, with the right schema syntax, the developer can inform the server of that link by using a directive, or 
 
 ```
 type Subscription {
