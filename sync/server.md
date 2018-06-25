@@ -307,6 +307,7 @@ For example, if you have a mutation for creating a 'Note', and also want to list
 ```
 type Note {
   id: ID
+  ownerId: ID
   content: String
 }
 
@@ -323,7 +324,7 @@ The `createNote` resolver function might use an in-memory pub/sub system/library
 In turn, the `noteCreated` resolver would listen for that event, and notify any connected Client about the event.
 
 As the Data Sync server is a generic GraphQL server, it has no way to know how Subscriptions relate to Queries and Mutations.
-However, with the right schema syntax, the developer can inform the server of that link by using a directive, or 
+However, with the right schema syntax, the developer can inform the server of that link by using a directive.
 
 ```
 type Subscription {
@@ -332,7 +333,27 @@ type Subscription {
 }
 ```
 
+It would also be possible to filter what events to subscribe to further.
+For example, if the subscription were to take an `ownerId` argument, only Notes created with a particular `ownerId` would trigger a notification.
 
+```
+type Subscription {
+	noteCreated(ownerId ID) : Note
+		@datasync_subscribe(mutations: ["createNote"])
+}
+```
+
+An example subsubscrition request from a Client would look like the following:
+
+```
+subscription noteCreatedForOwner6 {
+  noteCreated("6") {
+    id
+    ownerId
+    content
+  }
+}
+```
 
 ## Authentication
 
