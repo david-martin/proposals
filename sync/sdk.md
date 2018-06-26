@@ -66,7 +66,23 @@ x
 
 ## Client Metrics
 
-x
+Client metrics will focus on any metrics that can't be inferred on the Server whenever a Client makes a GraphQL request, or is connected to the server via websocket for Subscriptions.
+Based on this defintion, the scope for Client metrics extends to:
+
+* any Sync activity on the client that doesn't result in a request to the server e.g. interactions with the cache, optimistic responses
+* any attempted GraphQL requests while offline e.g. number of attempts or timeouts
+* client perspective on any successful GraphQL requests e.g. client request/response timings
+
+All these metrics will be maintained on the Client as a set of counters.
+Whenever the Client makes a GraphQL request to the server, it will include the latest value for all of these counters.
+These values will be exposed on the Server to Prometheus, which will allow them to be visualised in Grafana.
+
+The intial implementation of Client metrics will only look at the latest values received from Clients i.e. whenever they eventually make a successful request to the server.
+A future improvement to this could look at storing some amount of historical metrics on the Client.
+This would allow for a retroactive look at what a Client was doing while offline.
+However, there are timestamp considerations with consilidating the difference between client & server timestamps.
+There are also considerations about how much metrics to store, and how much is OK to send, particularly in poor network conditions.
+
 
 ## Authentication
 
