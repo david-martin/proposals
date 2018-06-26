@@ -24,12 +24,15 @@ More information about the GraphQL terminology and schema can be found at https:
 
 The Sync Server will provide a GraphQL API for Apps to store and retrieve data from, based on a defined Data Schema.
 The server will be written in Javascript for Node.js 8. It can use any language features (ES6) that are available in that runtime. Babel or Typescript will not be used.
-The server will leveraging various existing graphql libraries, such as `graphql`, `graphql-subscriptions`, `graphql-tools`, `apollo-server-express` and `subscriptions-transport-ws`.
+The server will leverage various existing graphql libraries, such as `graphql`, `graphql-subscriptions`, `graphql-tools`, `apollo-server-express` and `subscriptions-transport-ws`.
 The server will use the standard module mechanism, `npm`, for installing and managing these packages.
 Npm `scripts` will be used extensively for running CI and local development tasks, executing cli tools directly e.g. `nodemon`, `standard`, `mocha`.
 Build tools such as `grunt` or `gulp` will *not* be used as they introduce extra overhead where a simple cli command will suffice. See https://www.keithcirkel.co.uk/how-to-use-npm-as-a-build-tool/ for more info.
 
 ## Architecture
+
+![architecture](./architecture.png)
+src: https://docs.google.com/drawings/d/1OmMY1bbI8HDhlZ_cIirv7FYTEqRRV-Hh-g0ANtYEgBY/edit
 
 The Sync server is intended to be horizontally scalable.
 As such, it will us a [shared-nothing-architecture](https://en.wikipedia.org/wiki/Shared-nothing_architecture).
@@ -41,8 +44,6 @@ There will be a single server process which serves as the following:
 * API for managing the Data Schema and other GraphQL & Data Sync features
 * GraphQL API for Apps to send Queries & Mutations to
 * Subscriptions endpoint for Apps to connect to
-
-TODO: Updated architecture diagram based on https://docs.google.com/drawings/d/1OmMY1bbI8HDhlZ_cIirv7FYTEqRRV-Hh-g0ANtYEgBY/edit
 
 The main developer flow when using the Sync Server will be something like this:
 
