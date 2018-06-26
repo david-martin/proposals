@@ -44,7 +44,21 @@ The main work around supporting Subscriptions will be on the server.
 
 ## Offline Experience
 
-x
+When using the Apollo GraphQL Clients, there are 2 main factors to providing a good offline experience.
+The first factor is having a fast response instead of waiting for a potentially long, failing or timing out network call.
+This is handled in 2 ways.
+For Queries, a local query cache is used.
+The fetch policy can be configured so data is retrieved from the cache immediately, while a network request is also made for the latest data.
+See https://www.apollographql.com/docs/react/api/react-apollo.html#graphql-config-options-fetchPolicy for more info on fetch policies.
+For Mutations, an optimistic response can be written by the developer.
+The optimistic response is the most likely scenario if the mutation was to succeed.
+This allows the UI to update immediately without having to wait for the network.
+See https://www.apollographql.com/docs/react/features/optimistic-ui.html for more info.
+
+The second factor is ensuring consistency across local data while offline, and when eventually online again.
+If a mutation was adding a new entry to a table, then it stands to reason a query that were to list from that table should include the new entry too.
+When offline, an optimistic response for a mutation can be followed by an update to the appropriate qeury cache.
+See https://www.apollographql.com/docs/react/features/optimistic-ui.html#optimistic-advanced for more info on updating the query cache.
 
 ## Pagination
 
