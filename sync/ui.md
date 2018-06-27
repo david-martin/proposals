@@ -26,7 +26,10 @@ There are 4 main screens in the initial Admin UI:
 
 ### Data Schema
 
-The Schema Editor
+The link:https://redhat.invisionapp.com/share/4RLVQKKQ2VS#/screens/305421181[Schema Editor] will be used to define the types, mutations and subscriptions of the user's data structure. It will be split in two sections:
+
+. left side: a text editor where the user can edit the source of the schema
+. right side: an graphical (tree) representation of the schema. This will be used to explore the schema and also add a resolver to a type
 
 ### Data Sources
 
