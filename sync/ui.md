@@ -11,9 +11,9 @@ Any OpenShift user who has 'edit' access to the the `Deployment` object for the 
 
 ## Architecture
 
-The Admin UI will be located in the same repository as the Server. It will use React with JSX and the JSX will be compiled using link:https://reactjs.org/docs/add-react-to-a-website.html#add-jsx-to-a-project[babel]. We want to
-avoid the use of heavyweight build tools (Webpack, Grunt, Gulp) as much as possible and rely on npm scripts. For routing the most popular option (for web projects) is link:https://github.com/ReactTraining/react-router[react-router]. We can investigate others but i would suggest to use this library.
-As the Admin UI manages quite a lot of state i would also suggest to use link:https://redux.js.org[redux] as a central state management tool.
+The Admin UI will be located in the same repository as the Server. It will use React with JSX and the JSX will be compiled using [babel](https://reactjs.org/docs/add-react-to-a-website.html#add-jsx-to-a-project). We want to
+avoid the use of heavyweight build tools (Webpack, Grunt, Gulp) as much as possible and rely on npm scripts. For routing the most popular option (for web projects) is [react-router](https://github.com/ReactTraining/react-router). We can investigate others but i would suggest to use this library.
+As the Admin UI manages quite a lot of state i would also suggest to use [redux](https://redux.js.org) as a central state management tool.
 
 ## Screens
 
