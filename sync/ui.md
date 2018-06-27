@@ -26,6 +26,9 @@ There are 4 main screens in the initial Admin UI:
 
 ### Data Schema
 
+TODO: why a resolver per property (see screenshot)? Should it not be one resolver per type?
+TODO: is the left side editor interactive (should i be able to add/delete nodes in there)?
+
 The link:https://redhat.invisionapp.com/share/4RLVQKKQ2VS#/screens/305421181[Schema Editor] will be used to define the types, mutations and subscriptions of the user's data structure. It will be split in two sections:
 
 . left side: a text editor where the user can edit the source of the schema
@@ -33,12 +36,31 @@ The link:https://redhat.invisionapp.com/share/4RLVQKKQ2VS#/screens/305421181[Sch
 
 ### Data Sources
 
-x
+This link:https://redhat.invisionapp.com/share/4RLVQKKQ2VS#/screens/305423609[view] allows the user to view and manage data sources. Many data sources can be used in a single schema. There will be a button called `Add Data Source` which opens a link:https://redhat.invisionapp.com/share/4RLVQKKQ2VS#/screens/305424878[Pop-up] where the user can specify the type and credentials of the Data source.
+Editing and deleting Data sources should also be possible. 
 
 ### Resolver Mappings
 
-x
+TODO: Screen for resolver mappings list missing?
+TODO: Why do we need response mappings? Doesn't GraphQl let us define how the response exactly looks like?
+
+This section lets the user define queries for data sources and map them to resolvers.
+
+### Resolver mappings
+
+This view allows the user to create and manage request and response mapping templates. Those templates are always connected to a data source. Request templates are queries (e.g. SQL queries) that retrieve data. Response queries can be used to transform the retrieved data (e.g. string to JSON).
+
+### Resolver editor
+
+A Pop-up shown when the user clicks on `Add Resolver` in the `Data Schema` screen. It is used to combine a data source with queries to retrieve the data and transform the result. The queries are selected from pre-filled dropdowns. For example, there could be a resolver for the `User` type that combines the `Postgres` data source with a query `select {{userId}} from users;`.
+The view should have a dropdown to select the data source and to other dropdowns to select:
+
+. the request mapping template. Select a query to retrieve data. The source of the query will be shown below.
+
+. the response mapping template. Select a transformation to convert the retrieved data back into a form that the user is interested in. 
 
 ### Schema Playground
 
-x
+TODO: probably best to use graphiql and wrap it inside react.
+
+A screen where the user can run queries and inspect the results. We should use the default link:https://github.com/graphql/graphiql[Graphiql] view if possible.
