@@ -29,14 +29,14 @@ There are 4 main screens in the initial Admin UI:
 *TODO*: why a resolver per property (see screenshot)? Should it not be one resolver per type?
 *TODO*: is the left side editor interactive (should i be able to add/delete nodes in there)?
 
-The link:https://redhat.invisionapp.com/share/4RLVQKKQ2VS#/screens/305421181[Schema Editor] will be used to define the types, mutations and subscriptions of the user's data structure. It will be split in two sections:
+The [Schema Editor](https://redhat.invisionapp.com/share/4RLVQKKQ2VS#/screens/305421181) will be used to define the types, mutations and subscriptions of the user's data structure. It will be split in two sections:
 
 . left side: a text editor where the user can edit the source of the schema
 . right side: an graphical (tree) representation of the schema. This will be used to explore the schema and also add a resolver to a type
 
 ### Data Sources
 
-This link:https://redhat.invisionapp.com/share/4RLVQKKQ2VS#/screens/305423609[view] allows the user to view and manage data sources. Many data sources can be used in a single schema. There will be a button called `Add Data Source` which opens a link:https://redhat.invisionapp.com/share/4RLVQKKQ2VS#/screens/305424878[Pop-up] where the user can specify the type and credentials of the Data source.
+This [view](https://redhat.invisionapp.com/share/4RLVQKKQ2VS#/screens/305423609) allows the user to view and manage data sources. Many data sources can be used in a single schema. There will be a button called `Add Data Source` which opens a [Pop-up](https://redhat.invisionapp.com/share/4RLVQKKQ2VS#/screens/305424878) where the user can specify the type and credentials of the Data source.
 Editing and deleting Data sources should also be possible. 
 
 ### Resolver Mappings
@@ -63,4 +63,4 @@ The view should have a dropdown to select the data source and to other dropdowns
 
 *TODO*: probably best to use graphiql and wrap it inside react.
 
-A screen where the user can run queries and inspect the results. We should use the default link:https://github.com/graphql/graphiql[Graphiql] view if possible.
+A screen where the user can run queries and inspect the results. We should use the default [Graphiql](https://github.com/graphql/graphiql) view if possible.
