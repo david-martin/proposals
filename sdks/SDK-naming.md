@@ -13,10 +13,10 @@ Based on: https://groups.google.com/forum/#!topic/aerogear/pNmVTy0saDA
 
 ### Android:
 
-org.aerogear.android.ags.core - AeroGear Services Core
+org.aerogear.mobile.core - AeroGear Services Core
 
 Service example:
-org.aerogear.android.ags.sync - AeroGear Services Sync
+org.aerogear.mobile.sync - AeroGear Services Sync
 
 ### IOS:
 
@@ -31,3 +31,10 @@ AeroGear/AgsSync
 
 Service example:
 @aerogear/ags-sync
+
+## dotNet/Xamarin
+
+AeroGear.Mobile.Core 
+
+Service Example:
+AeroGear.Mobile.Sync 
