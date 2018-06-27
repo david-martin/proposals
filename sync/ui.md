@@ -26,8 +26,8 @@ There are 4 main screens in the initial Admin UI:
 
 ### Data Schema
 
-TODO: why a resolver per property (see screenshot)? Should it not be one resolver per type?
-TODO: is the left side editor interactive (should i be able to add/delete nodes in there)?
+*TODO*: why a resolver per property (see screenshot)? Should it not be one resolver per type?
+*TODO*: is the left side editor interactive (should i be able to add/delete nodes in there)?
 
 The link:https://redhat.invisionapp.com/share/4RLVQKKQ2VS#/screens/305421181[Schema Editor] will be used to define the types, mutations and subscriptions of the user's data structure. It will be split in two sections:
 
@@ -41,8 +41,8 @@ Editing and deleting Data sources should also be possible.
 
 ### Resolver Mappings
 
-TODO: Screen for resolver mappings list missing?
-TODO: Why do we need response mappings? Doesn't GraphQl let us define how the response exactly looks like?
+*TODO*: Screen for resolver mappings list missing?
+*TODO*: Why do we need response mappings? Doesn't GraphQl let us define how the response exactly looks like?
 
 This section lets the user define queries for data sources and map them to resolvers.
 
@@ -61,6 +61,6 @@ The view should have a dropdown to select the data source and to other dropdowns
 
 ### Schema Playground
 
-TODO: probably best to use graphiql and wrap it inside react.
+*TODO*: probably best to use graphiql and wrap it inside react.
 
 A screen where the user can run queries and inspect the results. We should use the default link:https://github.com/graphql/graphiql[Graphiql] view if possible.
